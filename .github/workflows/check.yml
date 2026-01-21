@@ -1,0 +1,22 @@
+name: Hourly Outage Check
+on:
+  schedule:
+    - cron: '0 * * * *' # רץ בכל שעה עגולה
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 openai
+      - name: Run script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        run: python monitor.py
