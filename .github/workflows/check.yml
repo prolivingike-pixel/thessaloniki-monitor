@@ -1,16 +1,15 @@
-name: Hourly Outage Check
+name: Utility Monitor with Memory
 on:
   schedule:
-    - cron: '0 * * * *' # רץ בכל שעה עגולה
+    - cron: '0 * * * *'
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
       - name: Install dependencies
@@ -20,3 +19,10 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: python monitor.py
+      - name: Commit and push state changes
+        run: |
+          git config --global user.name 'OutageBot'
+          git config --global user.email 'outagebot@users.noreply.github.com'
+          git add last_state.json || exit 0
+          git commit -m "Update outage state" || exit 0
+          git push
